@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [[ $# != 1 ]] ; then
+	echo "Usage: threadname <process_name>"
+	exit -1
+fi
+
+NAME=$1
+
+APP_PID=`ps aux | grep $NAME | grep -v grep | grep -v threadname | awk '{printf("%s\n",$2)}' `
+
+for i in `ps -T $APP_PID | awk '{ if(NR>1) {printf("%s ",$2)}}'`
+do
+	cat /proc/$i/stat | awk -F ")" '{print $1}' | awk -F "(" '{printf("thread_id:%d thread_name:%s\n",$1,$2)}'
+done
